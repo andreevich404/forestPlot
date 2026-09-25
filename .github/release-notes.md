@@ -20,10 +20,15 @@
 | `ForestPlot-macos-arm64` | macOS (Apple Silicon) | После скачивания: `chmod +x ForestPlot-macos-arm64`, затем запустить через правый клик → «Открыть» (Gatekeeper) |
 | `ForestPlot-linux-x64` | Linux x86-64 | После скачивания: `chmod +x ForestPlot-linux-x64 && ./ForestPlot-linux-x64` |
 
+## Что нового
+
+__CHANGES__
+
 ## Возможности
 
 - Загрузка данных из `.xlsx` / `.xls` / `.csv`
 - Fixed-effect и random-effects (DerSimonian–Laird) модели пулинга
 - Расчёт гетерогенности: I², Cochran's Q, p-value, τ²
 - Редактируемая таблица предпросмотра, предупреждения о некорректных данных
+- Шрифт графика — Times New Roman 14 pt, строку «Итого» можно скрыть
 - Экспорт графика в PNG/PDF и таблицы расчётов в CSV

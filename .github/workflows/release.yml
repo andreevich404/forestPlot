@@ -76,7 +76,14 @@ jobs:
           merge-multiple: true
 
       - name: Prepare release notes
-        run: sed "s/__TAG__/${GITHUB_REF_NAME}/g" .github/release-notes.md > release-notes.md
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          awk -v v="$VERSION" 'index($0, "## [" v "]") == 1 {f=1; next} /^## \[/ {f=0} f' CHANGELOG.md > changes.md
+          if [ ! -s changes.md ]; then
+            echo "В CHANGELOG.md нет раздела для версии $VERSION"
+            exit 1
+          fi
+          sed -e "s/__TAG__/${GITHUB_REF_NAME}/g" -e '/__CHANGES__/{r changes.md' -e 'd}' .github/release-notes.md > release-notes.md
 
       - uses: softprops/action-gh-release@v2
         with:
