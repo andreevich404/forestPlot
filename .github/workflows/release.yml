@@ -5,30 +5,31 @@ on:
     tags:
       - "v*"
 
-permissions:
-  contents: write
-
 jobs:
   build:
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: windows-latest
-            asset_name: ForestPlot-windows.exe
+            asset_name: ForestPlot-win64.exe
             artifact_path: dist/ForestPlot.exe
             extra_args: --windowed
           - os: macos-latest
-            asset_name: ForestPlot-macos
+            asset_name: ForestPlot-macos-arm64
             artifact_path: dist/ForestPlot
             extra_args: --windowed
           - os: ubuntu-latest
-            asset_name: ForestPlot-linux
+            asset_name: ForestPlot-linux-x64
             artifact_path: dist/ForestPlot
             extra_args: ""
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@v5
         with:
@@ -61,13 +62,24 @@ jobs:
 
   release:
     needs: build
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
           merge-multiple: true
 
+      - name: Prepare release notes
+        run: sed "s/__TAG__/${GITHUB_REF_NAME}/g" .github/release-notes.md > release-notes.md
+
       - uses: softprops/action-gh-release@v2
         with:
+          name: ${{ github.ref_name }}
+          body_path: release-notes.md
           files: artifacts/*
