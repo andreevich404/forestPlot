@@ -46,7 +46,7 @@ class ForestPlotApp(ctk.CTk):
 
         self.title("Форест-плот — построитель графиков")
         self.geometry("1180x800")
-        self.minsize(960, 640)
+        self.minsize(1100, 640)
         self.configure(fg_color=BG)
 
         self.studies: list[Study] = []
@@ -124,6 +124,13 @@ class ForestPlotApp(ctk.CTk):
         )
         self.model_selector.set(UI_MODEL_LABELS["fixed"])
         self.model_selector.pack(side="left")
+
+        self.total_switch = ctk.CTkSwitch(
+            controls_row, text="Показывать «Итого»", command=self.on_total_toggle,
+            progress_color=ACCENT, text_color=TEXT_MAIN, font=ctk.CTkFont(size=13),
+        )
+        self.total_switch.select()
+        self.total_switch.pack(side="right")
 
         self.stats_card = self._card(self, corner_radius=12)
         self.stats_card.pack(side="top", fill="x", padx=18, pady=(0, 10))
@@ -294,13 +301,17 @@ class ForestPlotApp(ctk.CTk):
         if self.studies:
             self._refresh_plot()
 
+    def on_total_toggle(self) -> None:
+        if self.studies:
+            self._refresh_plot()
+
     def _refresh_plot(self) -> None:
         if self.canvas is not None:
             self.canvas.get_tk_widget().destroy()
             self.canvas = None
         self.placeholder.place_forget()
 
-        figure = build_figure(self.studies, model=self.model)
+        figure = build_figure(self.studies, model=self.model, show_total=bool(self.total_switch.get()))
         figure.set_dpi(100)
         self.canvas = FigureCanvasTkAgg(figure, master=self.plot_frame)
         self.canvas.draw()
